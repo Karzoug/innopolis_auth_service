@@ -4,10 +4,21 @@ import (
 	"authservice/internal/domain"
 	"authservice/internal/service"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	_ "authservice/api"
+
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+//	@title			Swagger auth API
+//	@version		1.0
+//	@description	Authorization service.
+//	@termsOfService	http://swagger.io/terms/
+
+//	@host	localhost:8000
 func NewRouter() *http.ServeMux {
 	router := http.NewServeMux()
 	router.Handle("/sign_up", CORS(LogUser(http.HandlerFunc(SignUp))))
@@ -21,11 +32,26 @@ func NewRouter() *http.ServeMux {
 
 	router.Handle("/v2/get_user_info", CORS(Auth(LogUser(http.HandlerFunc(GetUserInfoV2)))))
 
+	router.Handle("GET /api/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8000/api/doc.json"), //The url pointing to API definition
+	))
+
 	return router
 }
 
+// GetUserInfoV2 gets user info.
+//
+//	@Summary		Get user info
+//	@Description	Get user info: short for user, full for admin
+//	@Tags			account
+//	@Accept			json
+//	@Produce		json
+//	@Param			User-ID	header		string	true	"user token"
+//	@Failure		default	{object}	HTTPResponse{data=nil}
+//	@Success		200		{object}	HTTPResponse{data=domain.UserInfo}	"short info for user"
+//	@Success		200		{object}	HTTPResponse{data=domain.User}		"full info for admin"
+//	@Router			/v2/get_user_info [get]
 func GetUserInfoV2(resp http.ResponseWriter, req *http.Request) {
-
 	respBody := &HTTPResponse{}
 	defer func() {
 		resp.Write(respBody.Marshall())
