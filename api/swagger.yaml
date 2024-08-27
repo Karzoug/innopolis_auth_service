@@ -1,0 +1,301 @@
+definitions:
+  domain.LoginPassword:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  domain.User:
+    properties:
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  domain.UserInfo:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  httphandler.ChangePswReq:
+    properties:
+      password:
+        type: string
+    type: object
+  httphandler.HTTPResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  httphandler.SetUserInfoReq:
+    properties:
+      name:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: Authorization service.
+  termsOfService: http://swagger.io/terms/
+  title: Swagger auth API
+  version: "1.0"
+paths:
+  /admin/get_user_info:
+    get:
+      consumes:
+      - application/json
+      description: Get full user info (id, name, role), only for admins
+      parameters:
+      - description: admin ID
+        in: header
+        name: User-ID
+        required: true
+        type: string
+      - description: user ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.User'
+              type: object
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Get full user info
+      tags:
+      - account
+  /change_psw:
+    post:
+      consumes:
+      - application/json
+      description: Change user password
+      parameters:
+      - description: a new password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/httphandler.ChangePswReq'
+      - description: user token
+        in: header
+        name: User-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Change user password
+      tags:
+      - auth
+  /get_user_info:
+    get:
+      consumes:
+      - application/json
+      description: Get short user info, only for users
+      parameters:
+      - description: user token
+        in: header
+        name: User-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.UserInfo'
+              type: object
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Get user info
+      tags:
+      - account
+  /set_user_info:
+    post:
+      consumes:
+      - application/json
+      description: Set short user info, only for users
+      parameters:
+      - description: user info
+        in: body
+        name: user_info
+        required: true
+        schema:
+          $ref: '#/definitions/httphandler.SetUserInfoReq'
+      - description: user token
+        in: header
+        name: User-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Set user info
+      tags:
+      - account
+  /sign_in:
+    post:
+      consumes:
+      - application/json
+      description: Sign in account with login and password
+      parameters:
+      - description: login and password
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Sign in account
+      tags:
+      - auth
+  /sign_up:
+    post:
+      consumes:
+      - application/json
+      description: Sign up account with login and password
+      parameters:
+      - description: login and password
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Sign up account
+      tags:
+      - auth
+  /v2/get_user_info:
+    get:
+      consumes:
+      - application/json
+      description: 'Get user info: short for user, full for admin'
+      parameters:
+      - description: user token
+        in: header
+        name: User-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: full info for admin
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.User'
+              type: object
+        default:
+          description: ""
+          schema:
+            allOf:
+            - $ref: '#/definitions/httphandler.HTTPResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Get user info
+      tags:
+      - account
+swagger: "2.0"

@@ -3,12 +3,24 @@ package httphandler
 import (
 	"authservice/internal/service"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// AdminGetUserInfo gets full user info.
+//
+//	@Summary		Get full user info
+//	@Description	Get full user info, only for admins
+//	@Tags			account
+//	@Accept			json
+//	@Produce		json
+//	@Param			User-ID	header		string	true	"admin token"
+//	@Param			user_id	query		string	true	"user ID"
+//	@Failure		default	{object}	HTTPResponse{data=nil}
+//	@Success		200		{object}	HTTPResponse{data=domain.User}
+//	@Router			/admin/get_user_info [get]
 func AdminGetUserInfo(resp http.ResponseWriter, req *http.Request) {
-
 	respBody := &HTTPResponse{}
 	defer func() {
 		resp.Write(respBody.Marshall())
